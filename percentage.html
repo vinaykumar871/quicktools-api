@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Percentage Calculator - QuickTools</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="logo">
+      <img src="assets/logo.png" alt="logo">
+      <span>QuickTools</span>
+    </div>
+
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="dashboard.html">Tools</a></li>
+    </ul>
+  </nav>
+
+  <!-- PERCENTAGE CALCULATOR -->
+  <section class="tool-page">
+    <h1>Percentage Calculator</h1>
+
+    <div class="tool-card">
+
+      <label>Obtained Marks:</label>
+      <input type="number" id="obtained" placeholder="Enter obtained marks">
+
+      <label>Total Marks:</label>
+      <input type="number" id="total" placeholder="Enter total marks">
+
+      <button onclick="calculatePercentage()">Calculate Percentage</button>
+
+      <p id="percentageResult">Enter values and click Calculate.</p>
+
+    </div>
+  </section>
+
+  <script>
+    function calculatePercentage() {
+      const obtained = parseFloat(document.getElementById("obtained").value);
+      const total = parseFloat(document.getElementById("total").value);
+
+      if (isNaN(obtained) || isNaN(total) || total === 0) {
+        document.getElementById("percentageResult").innerText = "Please enter valid values!";
+        return;
+      }
+
+      const percentage = ((obtained / total) * 100).toFixed(2);
+
+      document.getElementById("percentageResult").innerText = 
+        "Your Percentage is: " + percentage + "%";
+    }
+  </script>
+
+</body>
+</html>

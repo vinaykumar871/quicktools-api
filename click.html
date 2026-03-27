@@ -1,0 +1,115 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Click Speed Test - QuickTools</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">  <link rel="stylesheet" href="style.css">  <style>
+    .click-container {
+      text-align: center;
+      padding: 60px 8%;
+    }
+
+    .click-box {
+      margin-top: 40px;
+      padding: 80px;
+      background: #2563EB;
+      color: white;
+      font-size: 24px;
+      border-radius: 10px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .stats {
+      margin-top: 20px;
+      font-size: 20px;
+    }
+
+    .best {
+      margin-top: 10px;
+      color: green;
+    }
+  </style></head><body><!-- NAVBAR --><nav class="navbar">
+  <div class="logo">
+    <img src="assets/logo.png">
+    <span>QuickTools</span>
+  </div>
+</nav><section class="click-container">  <h1>🎯 Click Speed Test</h1>  <div id="clickBox" class="click-box">
+    Click to Start
+  </div>  <div class="stats" id="stats"></div>
+  <div class="best" id="bestScore"></div></section>
+  <script>
+
+let clicks = 0;
+let timer = null;
+let timeLeft = 5;
+let started = false;
+let gameOver = false; // ✅ NEW FLAG
+
+// LOAD BEST SCORE
+let best = localStorage.getItem("bestCPS") || 0;
+if (best) {
+  document.getElementById("bestScore").innerText =
+    "🏆 Best CPS: " + best;
+}
+
+const box = document.getElementById("clickBox");
+
+box.onclick = function () {
+
+  // ❌ PREVENT IMMEDIATE RESTART
+  if (gameOver) return;
+
+  // START GAME
+  if (!started) {
+    started = true;
+    clicks = 0;
+    timeLeft = 5;
+
+    box.innerText = "Click fast!";
+    document.getElementById("stats").innerText = "⏳ Time: 5s";
+
+    timer = setInterval(() => {
+      timeLeft--;
+
+      document.getElementById("stats").innerText =
+        "⏳ Time: " + timeLeft + "s";
+
+      if (timeLeft <= 0) {
+        clearInterval(timer);
+
+        const cps = (clicks / 5).toFixed(2);
+
+        document.getElementById("stats").innerText =
+          `🔥 Clicks: ${clicks} | ⚡ CPS: ${cps}`;
+
+        // SAVE BEST
+        if (cps > best) {
+          best = cps;
+          localStorage.setItem("bestCPS", best);
+          document.getElementById("bestScore").innerText =
+            "🏆 Best CPS: " + best;
+        }
+
+        box.innerText = "Click to Play Again";
+
+        started = false;
+        gameOver = true; // ✅ BLOCK CLICKS
+
+        // ✅ ALLOW CLICK AFTER DELAY
+        setTimeout(() => {
+          gameOver = false;
+        }, 800); // 0.8 sec buffer
+      }
+
+    }, 1000);
+
+  } else {
+    // COUNT CLICKS
+    clicks++;
+    box.innerText = clicks + " clicks";
+  }
+};
+
+</script>
+</body>
+</html>

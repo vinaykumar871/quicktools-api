@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login - QuickTools</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="auth-page">
+
+<div class="login-container">
+  <h2>Login</h2>
+
+  <input type="text" id="username" placeholder="Username">
+  <input type="password" id="password" placeholder="Password">
+
+  <button onclick="login()">Login</button>
+
+  <p id="msg"></p>
+
+  <p>Don't have account? <a href="signup.html">Sign Up</a></p>
+</div>
+
+<script>
+async function login() {
+  const email = document.getElementById("username").value.trim();
+  const password = document.getElementById("password").value.trim();
+
+  if (!email || !password) {
+    document.getElementById("msg").innerText = "⚠️ Fill all fields";
+    return;
+  }
+
+  try {
+    const res = await fetch("https://quicktools-backend-b775.onrender.com/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+     body: JSON.stringify({ username: email, password })
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      localStorage.setItem("user", email);
+      localStorage.setItem("token", data.token);
+      window.location.href = "admin.html";
+    } else {
+      document.getElementById("msg").innerText = "❌ Invalid login";
+    }
+
+  } catch (err) {
+    console.log(err);
+  }
+}
+</script>
+
+</body>
+</html>

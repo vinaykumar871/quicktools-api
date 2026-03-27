@@ -1,0 +1,58 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Contact - QuickTools</title>  <meta name="description" content="Contact QuickTools for support, feedback, or queries.">  <meta name="viewport" content="width=device-width, initial-scale=1.0">  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head><body><!-- NAVBAR --><nav class="navbar">
+  <div class="logo">
+    <img src="assets/logo.png" alt="logo">
+    <span>QuickTools</span>
+  </div>  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="dashboard.html">Tools</a></li>
+    <li><a href="about.html">About</a></li>
+    <li><a href="privacy.html">Privacy</a></li>
+  </ul>
+</nav><!-- CONTACT SECTION --><section class="tool-page">  <h1>Contact Us</h1>  <div class="tool-card" style="max-width:600px; margin:auto;"><input type="text" id="name" placeholder="Your Name">
+<input type="email" id="email" placeholder="Your Email">
+<textarea id="message" placeholder="Your Message"></textarea>
+
+<button onclick="sendMessage()">Send Message</button>
+
+<p id="status" style="margin-top:10px;"></p>
+
+  </div></section><script>
+async function sendMessage() {
+  const name = document.getElementById("name").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const message = document.getElementById("message").value.trim();
+
+  if (!name || !email || !message) {
+    document.getElementById("status").innerText = "⚠ Fill all fields";
+    return;
+  }
+
+  try {
+    const res = await fetch("https://quicktools-backend-b775.onrender.com/contact", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ name, email, message })
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      document.getElementById("status").innerText = "✅ Message saved!";
+    } else {
+      document.getElementById("status").innerText = "❌ Failed to send!";
+    }
+
+  } catch (err) {
+    document.getElementById("status").innerText = "⚠ Server error!";
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,151 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Memory Game - QuickTools</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">  <link rel="stylesheet" href="style.css">  <style>
+    .memory-container {
+      text-align: center;
+      padding: 60px 8%;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 80px);
+      gap: 10px;
+      justify-content: center;
+      margin-top: 30px;
+    }
+
+    .card {
+      width: 80px;
+      height: 80px;
+      background: #2563EB;
+      color: white;
+      font-size: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border-radius: 8px;
+      user-select: none;
+    }
+
+    .card.flipped {
+      background: #16a34a;
+    }
+
+    .stats {
+      margin-top: 20px;
+      font-size: 18px;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      border: none;
+      background: #2563EB;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #1d4ed8;
+    }
+  </style></head><body><nav class="navbar">
+  <div class="logo">
+    <img src="assets/logo.png">
+    <span>QuickTools</span>
+  </div>
+</nav><section class="memory-container">  <h1>🧠 Memory Game</h1>  <div class="stats">
+    Moves: <span id="moves">0</span> |
+    Time: <span id="time">0</span>s
+  </div>  <div class="grid" id="grid"></div><button onclick="startGame()">Restart</button>
+
+</section><script>
+
+let symbols = ["🍎","🍌","🍇","🍉","🍒","🥝","🍍","🥑"];
+let cards = [];
+let flipped = [];
+let moves = 0;
+let matched = 0;
+let timer = 0;
+let interval;
+
+// SHUFFLE
+function shuffle(array) {
+  return array.sort(() => Math.random() - 0.5);
+}
+
+function startGame() {
+  const grid = document.getElementById("grid");
+  grid.innerHTML = "";
+
+  cards = shuffle([...symbols, ...symbols]);
+  flipped = [];
+  moves = 0;
+  matched = 0;
+  timer = 0;
+
+  document.getElementById("moves").innerText = 0;
+  document.getElementById("time").innerText = 0;
+
+  clearInterval(interval);
+  interval = setInterval(() => {
+    timer++;
+    document.getElementById("time").innerText = timer;
+  }, 1000);
+
+  cards.forEach((symbol, index) => {
+    const div = document.createElement("div");
+    div.className = "card";
+    div.dataset.symbol = symbol;
+    div.dataset.index = index;
+
+    div.onclick = () => flipCard(div);
+
+    grid.appendChild(div);
+  });
+}
+
+function flipCard(card) {
+
+  if (flipped.length === 2 || card.classList.contains("flipped")) return;
+
+  card.innerText = card.dataset.symbol;
+  card.classList.add("flipped");
+
+  flipped.push(card);
+
+  if (flipped.length === 2) {
+    moves++;
+    document.getElementById("moves").innerText = moves;
+
+    if (flipped[0].dataset.symbol === flipped[1].dataset.symbol) {
+      matched += 2;
+      flipped = [];
+
+      if (matched === cards.length) {
+        clearInterval(interval);
+        setTimeout(() => {
+          alert(`🎉 You won in ${moves} moves & ${timer}s`);
+        }, 300);
+      }
+
+    } else {
+      setTimeout(() => {
+        flipped.forEach(c => {
+          c.innerText = "";
+          c.classList.remove("flipped");
+        });
+        flipped = [];
+      }, 700);
+    }
+  }
+}
+
+// START ON LOAD
+startGame();
+
+</script></body>
+</html>

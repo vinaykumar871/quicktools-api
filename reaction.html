@@ -1,0 +1,105 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Reaction Test - QuickTools</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">  <link rel="stylesheet" href="style.css">  <style>
+    .reaction-box {
+      margin-top: 40px;
+      padding: 100px;
+      background: red;
+      color: white;
+      font-size: 24px;
+      text-align: center;
+      border-radius: 10px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .reaction-container {
+      text-align: center;
+      padding: 60px 8%;
+    }
+
+    .result {
+      margin-top: 20px;
+      font-size: 22px;
+      font-weight: 500;
+    }
+
+    .best {
+      margin-top: 10px;
+      color: green;
+    }
+  </style></head><body><!-- NAVBAR --><nav class="navbar">
+  <div class="logo">
+    <img src="assets/logo.png">
+    <span>QuickTools</span>
+  </div>
+</nav><section class="reaction-container">  <h1>⚡ Reaction Speed Test</h1>  <div id="box" class="reaction-box">
+    Click to Start
+  </div>  <div class="result" id="result"></div>
+  <div class="best" id="bestScore"></div></section><script>
+
+let startTime, timeout;
+let waiting = false;
+
+// LOAD BEST SCORE
+let best = localStorage.getItem("bestReaction") || null;
+if (best) {
+  document.getElementById("bestScore").innerText = "🏆 Best: " + best + " ms";
+}
+
+const box = document.getElementById("box");
+
+box.onclick = function () {
+
+  // TOO EARLY CLICK
+  if (waiting) {
+    clearTimeout(timeout);
+    box.style.background = "red";
+    box.innerText = "❌ Too Soon! Click to try again";
+    document.getElementById("result").innerText = "";
+    waiting = false;
+    return;
+  }
+
+  // START GAME
+  if (!startTime) {
+    box.innerText = "Wait for green...";
+    box.style.background = "orange";
+
+    const delay = Math.random() * 3000 + 2000;
+
+    waiting = true;
+
+    timeout = setTimeout(() => {
+      box.style.background = "green";
+      box.innerText = "CLICK NOW!";
+      startTime = new Date().getTime();
+      waiting = false;
+    }, delay);
+
+  } else {
+    // CLICK AFTER GREEN
+    const reactionTime = new Date().getTime() - startTime;
+
+    document.getElementById("result").innerText =
+      "⚡ Your Reaction: " + reactionTime + " ms";
+
+    // SAVE BEST SCORE
+    if (!best || reactionTime < best) {
+      best = reactionTime;
+      localStorage.setItem("bestReaction", best);
+      document.getElementById("bestScore").innerText =
+        "🏆 Best: " + best + " ms";
+    }
+
+    box.style.background = "red";
+    box.innerText = "Click to Play Again";
+
+    startTime = null;
+  }
+};
+
+</script></body>
+</html>

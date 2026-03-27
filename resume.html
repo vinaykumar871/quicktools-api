@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+
+  <title>Resume Builder - QuickTools</title>
+
+  <meta name="description" content="Create professional resumes easily and download as PDF.">
+  <meta name="keywords" content="resume builder, create resume, free resume generator">
+  <meta name="author" content="QuickTools">
+  <meta name="robots" content="index, follow">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+
+  <!-- ✅ PDF LIBRARY -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="logo">
+    <img src="assets/logo.png" alt="logo">
+    <span>QuickTools</span>
+  </div>
+
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="dashboard.html">Tools</a></li>
+  </ul>
+</nav>
+
+<!-- RESUME BUILDER -->
+<section class="tool-page">
+  <h1>Resume Builder</h1>
+
+  <div class="resume-container">
+
+    <!-- FORM -->
+    <div class="resume-form">
+
+      <input type="text" id="name" placeholder="Full Name">
+      <input type="text" id="phone" placeholder="Phone Number">
+      <input type="email" id="email" placeholder="Email Address">
+
+      <textarea id="objective" placeholder="Career Objective"></textarea>
+
+      <textarea id="degree" placeholder="Degree (B.Tech details)"></textarea>
+      <textarea id="inter" placeholder="Intermediate details"></textarea>
+      <textarea id="ssc" placeholder="SSC details"></textarea>
+
+      <textarea id="skills" placeholder="Technical Skills (comma separated)"></textarea>
+      <textarea id="languages" placeholder="Languages Known (comma separated)"></textarea>
+
+      <textarea id="projects" placeholder="Projects (each line separate)"></textarea>
+      <textarea id="certifications" placeholder="Certifications (each line separate)"></textarea>
+
+      <button onclick="generateResume()">Generate Resume</button>
+      <button onclick="downloadPDF()">Download PDF</button>
+
+    </div>
+
+    <!-- PREVIEW -->
+    <div class="resume-preview" id="resumePreview">
+      <h2>Your Resume Preview</h2>
+    </div>
+
+  </div>
+</section>
+
+<!-- ✅ SCRIPT -->
+<script>
+function generateResume() {
+  const name = document.getElementById("name").value || "";
+  const phone = document.getElementById("phone").value || "";
+  const email = document.getElementById("email").value || "";
+  const objective = document.getElementById("objective").value || "";
+
+  const degree = document.getElementById("degree").value || "";
+  const inter = document.getElementById("inter").value || "";
+  const ssc = document.getElementById("ssc").value || "";
+
+  const skills = (document.getElementById("skills").value || "").split(",");
+  const languages = (document.getElementById("languages").value || "").split(",");
+  const projects = (document.getElementById("projects").value || "").split("\n");
+  const certifications = (document.getElementById("certifications").value || "").split("\n");
+
+  const preview = document.getElementById("resumePreview");
+
+  preview.innerHTML = `
+    <div class="resume-box">
+      <h2 class="name">${name}</h2>
+      <p>${phone}</p>
+      <p>${email}</p>
+
+      <h3>OBJECTIVE</h3>
+      <p>${objective}</p>
+
+      <h3>EDUCATION</h3>
+      <ul>
+        <li><strong>Degree:</strong> ${degree}</li>
+        <li><strong>Intermediate:</strong> ${inter}</li>
+        <li><strong>SSC:</strong> ${ssc}</li>
+      </ul>
+
+      <h3>TECHNICAL SKILLS</h3>
+      <ul>
+        ${skills.map(s => s.trim()).filter(s => s).map(s => `<li>${s}</li>`).join("")}
+      </ul>
+
+      <h3>LANGUAGES</h3>
+      <ul>
+        ${languages.map(l => l.trim()).filter(l => l).map(l => `<li>${l}</li>`).join("")}
+      </ul>
+
+      <h3>PROJECTS</h3>
+      <ul>
+        ${projects.map(p => p.trim()).filter(p => p).map(p => `<li>${p}</li>`).join("")}
+      </ul>
+
+      <h3>CERTIFICATIONS</h3>
+      <ul>
+        ${certifications.map(c => c.trim()).filter(c => c).map(c => `<li>${c}</li>`).join("")}
+      </ul>
+    </div>
+  `;
+}
+
+function downloadPDF() {
+  const element = document.getElementById("resumePreview");
+
+  if (!element.innerText.trim()) {
+    alert("⚠ Please generate resume first!");
+    return;
+  }
+
+  const opt = {
+    margin: 0.5,
+    filename: 'QuickTools_Resume.pdf',
+    image: { type: 'jpeg', quality: 1 },
+    html2canvas: { scale: 2 },
+    jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+  };
+
+  html2pdf().set(opt).from(element).save();
+}
+</script>
+
+</body>
+</html>

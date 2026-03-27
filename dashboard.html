@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+
+  <title>Dashboard - QuickTools</title>
+
+  <meta name="description" content="Explore free tools like CGPA Calculator, Resume Builder and ATS Resume Checker.">
+
+  <meta name="keywords" content="dashboard tools, student tools, resume tools">
+
+  <meta name="author" content="QuickTools">
+
+  <meta name="robots" content="index, follow">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<script>
+// 🔐 Protect page
+if (!localStorage.getItem("token")) {
+  window.location.href = "login.html";
+}
+
+// 🚪 Logout function
+function logout() {
+  localStorage.removeItem("user");
+  localStorage.removeItem("token");
+  window.location.href = "login.html";
+}
+</script>
+
+<body>
+
+<nav class="navbar">
+  <div class="logo">
+    <span>QuickTools</span>
+  </div>
+
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><button onclick="logout()">Logout</button></li>
+  </ul>
+</nav>
+
+<section class="dashboard">
+  <h1>Welcome, <span id="username"></span> 👋</h1>
+<h1> 📚 Academic Zone</h1>
+  <div class="tools-grid">
+    <a href="cgpa.html" class="tool-card">CGPA Calculator</a>
+    <a href="age.html" class="tool-card">Age Calculator</a>
+    <a href="percentage.html" class="tool-card">Percentage</a>
+    <a href="resume.html" class="tool-card">Resume Builder</a>
+    <a href="ats.html" class="tool-card">ATS Checker</a>
+    
+  </div>
+</section>
+<!-- 🎮 FUN ZONE -->
+<section class="dashboard">
+  <h1>🎮 Fun Zone</h1>
+
+  <div class="tools-grid">
+
+    <a href="typing.html" class="tool-card">
+      <h3>⌨ Typing Test</h3>
+      <p>Check speed & accuracy</p>
+    </a>
+
+    <a href="reaction.html" class="tool-card">
+  <h3>⚡ Reaction Test</h3>
+  <p>Test your reflex speed</p>
+</a>
+
+   <a href="click.html" class="tool-card">
+  <h3>🎯 Click Speed</h3>
+  <p>Test how fast you can click</p>
+</a>
+
+    <a href="memory.html" class="tool-card">
+  <h3>🧠 Memory Game</h3>
+  <p>Train your brain & focus</p>
+</a>
+
+  </div>
+</section>
+
+<script>
+document.getElementById("username").innerText =
+  localStorage.getItem("user");
+</script>
+
+</body>
+</html>

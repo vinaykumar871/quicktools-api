@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Age Calculator - QuickTools</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="logo">
+      <img src="assets/logo.png" alt="logo">
+      <span>QuickTools</span>
+    </div>
+
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="dashboard.html">Tools</a></li>
+    </ul>
+  </nav>
+
+  <!-- AGE CALCULATOR -->
+  <section class="tool-page">
+    <h1>Age Calculator</h1>
+
+    <div class="tool-card">
+      <label for="birthdate">Select Your Birthdate:</label>
+      <input type="date" id="birthdate">
+
+      <button onclick="calculateAge()">Calculate Age</button>
+
+      <p id="result">Enter your birthdate and click Calculate.</p>
+    </div>
+  </section>
+
+  <script>
+    function calculateAge() {
+      const birthdate = document.getElementById("birthdate").value;
+
+      if (!birthdate) {
+        document.getElementById("result").innerText = "Please select a date!";
+        return;
+      }
+
+      const birth = new Date(birthdate);
+      const today = new Date();
+
+      let age = today.getFullYear() - birth.getFullYear();
+      const monthDiff = today.getMonth() - birth.getMonth();
+
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+        age--;
+      }
+
+      document.getElementById("result").innerText = "Your Age is: " + age + " years";
+    }
+  </script>
+
+</body>
+</html>

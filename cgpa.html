@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CGPA Calculator - QuickTools</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="logo">
+      <img src="assets/logo.png" alt="logo">
+      <span>QuickTools</span>
+    </div>
+
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="dashboard.html">Tools</a></li>
+    </ul>
+  </nav>
+
+  <!-- CGPA CALCULATOR -->
+  <section class="tool-page">
+    <h1>CGPA Calculator</h1>
+
+    <div class="tool-card">
+
+      <label>Enter Grades (comma separated):</label>
+      <input type="text" id="grades" placeholder="e.g. 8,7,9,10">
+
+      <button onclick="calculateCGPA()">Calculate CGPA</button>
+
+      <p id="cgpaResult">Enter your grades and click Calculate.</p>
+
+    </div>
+  </section>
+
+  <script>
+    function calculateCGPA() {
+      const input = document.getElementById("grades").value;
+
+      if (!input) {
+        document.getElementById("cgpaResult").innerText = "Please enter grades!";
+        return;
+      }
+
+      const grades = input.split(",").map(Number);
+
+      let sum = 0;
+
+      for (let i = 0; i < grades.length; i++) {
+        if (isNaN(grades[i])) {
+          document.getElementById("cgpaResult").innerText = "Invalid input!";
+          return;
+        }
+        sum += grades[i];
+      }
+
+      const cgpa = (sum / grades.length).toFixed(2);
+
+      document.getElementById("cgpaResult").innerText = "Your CGPA is: " + cgpa;
+    }
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Typing Speed Test - QuickTools</title>
+
+<link rel="stylesheet" href="style.css">
+
+<style>
+.typing-box {
+  max-width: 700px;
+  margin: auto;
+  text-align: center;
+  background: white;
+  padding: 30px;
+  border-radius: 10px;
+}
+
+#text span.correct { color: green; }
+#text span.wrong { color: red; }
+#text span.active { text-decoration: underline; }
+
+textarea {
+  width: 100%;
+  height: 120px;
+  margin-top: 15px;
+}
+
+.stats {
+  margin-top: 15px;
+}
+
+select, button {
+  margin-top: 10px;
+  padding: 8px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="typing-box">
+  <h2>⌨ Typing Speed Test</h2>
+
+  <!-- Difficulty -->
+  <select id="difficulty">
+    <option value="easy">Easy</option>
+    <option value="medium">Medium</option>
+    <option value="hard">Hard</option>
+  </select>
+
+  <!-- Paragraph -->
+  <p id="text"></p>
+
+  <textarea id="input" placeholder="Start typing..." disabled></textarea>
+
+  <div class="stats">
+    ⏱ <span id="time">30</span>s |
+    ⚡ <span id="wpm">0</span> WPM |
+    🎯 <span id="accuracy">0</span>%
+  </div>
+
+  <button onclick="startTest()">Start</button>
+
+  <!-- Leaderboard -->
+  <h3>🏆 Leaderboard</h3>
+  <ul id="leaderboard"></ul>
+</div>
+
+<script>
+const paragraphs = {
+  easy: [
+    "Typing is fun and easy when you practice daily.",
+    "Practice makes perfect keep going."
+  ],
+  medium: [
+    "Typing speed improves with consistent effort and proper finger placement.",
+    "Focus on accuracy first then speed will automatically increase."
+  ],
+  hard: [
+    "Success in typing requires dedication patience and continuous improvement over time.",
+    "Consistency and focus are the keys to mastering any skill in life."
+  ]
+};
+
+let currentText = "";
+let timer = 30;
+let interval;
+let started = false;
+
+// 🔊 Sound
+const keySound = new Audio("https://www.soundjay.com/button/beep-07.wav");
+
+function startTest() {
+  const level = document.getElementById("difficulty").value;
+  const list = paragraphs[level];
+
+  currentText = list[Math.floor(Math.random() * list.length)];
+
+  const textContainer = document.getElementById("text");
+
+  textContainer.innerHTML = currentText
+    .split("")
+    .map(c => `<span>${c}</span>`)
+    .join("");
+
+  document.getElementById("input").value = "";
+  document.getElementById("input").disabled = false;
+  document.getElementById("input").focus();
+
+  timer = 30;
+  document.getElementById("time").innerText = timer;
+
+  started = true;
+
+  interval = setInterval(() => {
+    timer--;
+    document.getElementById("time").innerText = timer;
+
+    if (timer === 0) {
+      clearInterval(interval);
+      finishTest();
+    }
+  }, 1000);
+}
+
+document.getElementById("input").addEventListener("input", () => {
+  if (!started) return;
+
+  keySound.currentTime = 0;
+  keySound.play();
+
+  const typed = document.getElementById("input").value;
+  const spans = document.querySelectorAll("#text span");
+
+  let correct = 0;
+
+  spans.forEach((span, index) => {
+    const char = typed[index];
+
+    span.classList.remove("correct", "wrong", "active");
+
+    if (char == null) {
+      span.classList.add("active");
+    } else if (char === span.innerText) {
+      span.classList.add("correct");
+      correct++;
+    } else {
+      span.classList.add("wrong");
+    }
+  });
+
+  const accuracy = Math.round((correct / typed.length) * 100) || 0;
+  const words = typed.trim().split(" ").length;
+  const wpm = Math.round((words / (30 - timer)) * 60) || 0;
+
+  document.getElementById("accuracy").innerText = accuracy;
+  document.getElementById("wpm").innerText = wpm;
+});
+
+function finishTest() {
+  started = false;
+  document.getElementById("input").disabled = true;
+
+  const wpm = document.getElementById("wpm").innerText;
+
+  saveScore(wpm);
+  loadLeaderboard();
+}
+
+function saveScore(score) {
+  let scores = JSON.parse(localStorage.getItem("scores")) || [];
+  scores.push(score);
+  scores.sort((a, b) => b - a);
+  scores = scores.slice(0, 5);
+
+  localStorage.setItem("scores", JSON.stringify(scores));
+}
+
+function loadLeaderboard() {
+  const list = document.getElementById("leaderboard");
+  list.innerHTML = "";
+
+  let scores = JSON.parse(localStorage.getItem("scores")) || [];
+
+  scores.forEach((s, i) => {
+    list.innerHTML += `<li>#${i + 1} - ${s} WPM</li>`;
+  });
+}
+
+// Load leaderboard on start
+loadLeaderboard();
+</script>
+
+</body>
+</html>

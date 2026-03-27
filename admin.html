@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Panel - QuickTools</title>
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    body {
+      font-family: Poppins;
+      background: #f4f6f9;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .card {
+      background: white;
+      padding: 15px;
+      margin: 10px auto;
+      border-radius: 10px;
+      max-width: 600px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .email {
+      color: blue;
+    }
+
+    .date {
+      font-size: 12px;
+      color: gray;
+    }
+  </style>
+</head>
+
+<body>
+
+<h1>📩 Contact Messages</h1>
+<div id="stats" style="display:flex; gap:15px; margin-bottom:20px;">
+  
+  <div class="card">
+    <h3 id="totalMessages">0</h3>
+    <p>📩 Messages</p>
+  </div>
+
+  <div class="card">
+    <h3 id="totalUsers">0</h3>
+    <p>👤 Users</p>
+  </div>
+
+</div>
+<input 
+  type="text" 
+  id="searchInput" 
+  placeholder="🔍 Search by name or email..." 
+  onkeyup="filterMessages()" 
+  style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 8px; border: 1px solid #ccc;"
+>
+
+<div id="messages"></div>
+
+<script>
+async function loadStats() {
+  const res = await fetch("https://quicktools-backend-b775.onrender.com");
+  const data = await res.json();
+
+  document.getElementById("totalMessages").innerText = data.messages;
+  document.getElementById("totalUsers").innerText = data.users;
+}
+// ✅ GLOBAL STORAGE
+let allMessages = [];
+
+// ==========================
+// LOAD MESSAGES
+// ==========================
+async function loadMessages() {
+  const res = await fetch("https://quicktools-backend-b775.onrender.com/contact");
+
+  allMessages = await res.json();   // ✅ store data
+  displayMessages(allMessages);     // ✅ call display
+}
+
+// ==========================
+// DISPLAY FUNCTION (STEP 4)
+// ==========================
+function displayMessages(data) {
+  const container = document.getElementById("messages");
+  container.innerHTML = "";
+
+  data.forEach(msg => {
+    container.innerHTML += `
+      <div class="card">
+        <h3>${msg.name}</h3>
+        <p class="email">${msg.email}</p>
+        <p>${msg.message}</p>
+        <p class="date">${new Date(msg.createdAt).toLocaleString()}</p>
+
+        <button onclick="deleteMessage('${msg._id}')">🗑 Delete</button>
+      </div>
+    `;
+  });
+}
+
+// ==========================
+// DELETE FUNCTION
+// ==========================
+async function deleteMessage(id) {
+  if (!confirm("Delete this message?")) return;
+
+  await fetch(`https://quicktools-backend-b775.onrender.com/contact/${id}`, {
+    method: "DELETE"
+  });
+
+  alert("Deleted!");
+  loadMessages();
+}
+
+// ==========================
+// FILTER FUNCTION
+// ==========================
+function filterMessages() {
+  const search = document.getElementById("searchInput").value.toLowerCase();
+
+  const filtered = allMessages.filter(msg =>
+    msg.name.toLowerCase().includes(search) ||
+    msg.email.toLowerCase().includes(search)
+  );
+
+  displayMessages(filtered);
+}
+
+// ✅ INITIAL LOAD
+
+
+loadMessages();
+loadStats(); // ✅ ADD THIS
+
+</script>
+
+
+
+</body>
+</html>
