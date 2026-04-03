@@ -15,8 +15,10 @@
 <div class="login-container">
   <h2>Login</h2>
 
-  <input type="text" id="username" placeholder="Username">
-  <input type="password" id="password" placeholder="Password">
+  <!-- ✅ EMAIL INPUT -->
+  <input type="email" id="email" placeholder="Enter email">
+
+  <input type="password" id="password" placeholder="Enter password">
 
   <button onclick="login()">Login</button>
 
@@ -27,7 +29,7 @@
 
 <script>
 async function login() {
-  const email = document.getElementById("username").value.trim();
+  const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value.trim();
 
   if (!email || !password) {
@@ -41,7 +43,10 @@ async function login() {
       headers: {
         "Content-Type": "application/json"
       },
-     body: JSON.stringify({ username: email, password })
+      body: JSON.stringify({
+        username: email,
+        password: password
+      })
     });
 
     const data = await res.json();
@@ -49,13 +54,21 @@ async function login() {
     if (data.success) {
       localStorage.setItem("user", email);
       localStorage.setItem("token", data.token);
-      window.location.href = "admin.html";
+
+      // 🔥 ADMIN CHECK
+      if (email === "quicktoolsstudent@gmail.com") {
+        window.location.href = "admin.html"; // ✅ ADMIN
+      } else {
+        window.location.href = "index.html"; // ✅ NORMAL USER
+      }
+
     } else {
       document.getElementById("msg").innerText = "❌ Invalid login";
     }
 
   } catch (err) {
     console.log(err);
+    document.getElementById("msg").innerText = "❌ Server error";
   }
 }
 </script>

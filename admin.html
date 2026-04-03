@@ -2,146 +2,178 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Admin Panel - QuickTools</title>
+  <title>Admin Dashboard - QuickTools</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
-
-  <style>
-    body {
-      font-family: Poppins;
-      background: #f4f6f9;
-      padding: 20px;
-    }
-
-    h1 {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    .card {
-      background: white;
-      padding: 15px;
-      margin: 10px auto;
-      border-radius: 10px;
-      max-width: 600px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    }
-
-    .email {
-      color: blue;
-    }
-
-    .date {
-      font-size: 12px;
-      color: gray;
-    }
-  </style>
 </head>
 
 <body>
 
-<h1>📩 Contact Messages</h1>
-<div id="stats" style="display:flex; gap:15px; margin-bottom:20px;">
-  
-  <div class="card">
-    <h3 id="totalMessages">0</h3>
-    <p>📩 Messages</p>
+<!-- 🔐 ADMIN PROTECTION -->
+<script>
+const adminEmail = "quicktoolsstudent@gmail.com";
+
+const user = localStorage.getItem("user");
+
+if (!localStorage.getItem("token") || user !== adminEmail) {
+  alert("Access Denied ❌");
+  window.location.href = "index.html";
+}
+</script>
+
+<div class="admin-container">
+
+  <h1>📊 Admin Dashboard</h1>
+
+  <p class="welcome">
+    Welcome, <span id="adminName"></span>
+    <button onclick="logout()">Logout</button>
+  </p>
+
+  <!-- 📊 STATS -->
+  <div class="stats">
+    <div class="box">
+      <h3 id="users">0</h3>
+      <p>Total Users</p>
+    </div>
+
+    <div class="box">
+      <h3 id="messages">0</h3>
+      <p>Total Messages</p>
+    </div>
   </div>
 
-  <div class="card">
-    <h3 id="totalUsers">0</h3>
-    <p>👤 Users</p>
-  </div>
+  <!-- 📩 MESSAGES -->
+  <h2>📩 Contact Messages</h2>
+  <div id="messageList"></div>
+
+  <!-- 👥 USERS -->
+  <h2>👥 Users</h2>
+  <div id="userList"></div>
 
 </div>
-<input 
-  type="text" 
-  id="searchInput" 
-  placeholder="🔍 Search by name or email..." 
-  onkeyup="filterMessages()" 
-  style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 8px; border: 1px solid #ccc;"
->
-
-<div id="messages"></div>
 
 <script>
+const backend = "https://quicktools-backend-b775.onrender.com";
+
+// 🔥 TOKEN (IMPORTANT)
+const token = localStorage.getItem("token");
+
+// 👤 Show admin name
+document.getElementById("adminName").innerText = localStorage.getItem("user");
+
+// 🚪 Logout
+function logout() {
+  localStorage.clear();
+  window.location.href = "login.html";
+}
+
+// 📊 Load stats
 async function loadStats() {
-  const res = await fetch("https://quicktools-backend-b775.onrender.com");
+  const res = await fetch(backend + "/stats", {
+    headers: {
+      Authorization: token
+    }
+  });
+
   const data = await res.json();
 
-  document.getElementById("totalMessages").innerText = data.messages;
-  document.getElementById("totalUsers").innerText = data.users;
+  document.getElementById("users").innerText = data.users;
+  document.getElementById("messages").innerText = data.messages;
 }
-// ✅ GLOBAL STORAGE
-let allMessages = [];
 
-// ==========================
-// LOAD MESSAGES
-// ==========================
+// 📩 Load messages
 async function loadMessages() {
-  const res = await fetch("https://quicktools-backend-b775.onrender.com/contact");
+  const res = await fetch(backend + "/contacts", {
+    headers: {
+      Authorization: token
+    }
+  });
 
-  allMessages = await res.json();   // ✅ store data
-  displayMessages(allMessages);     // ✅ call display
-}
+  const data = await res.json();
 
-// ==========================
-// DISPLAY FUNCTION (STEP 4)
-// ==========================
-function displayMessages(data) {
-  const container = document.getElementById("messages");
+  const container = document.getElementById("messageList");
   container.innerHTML = "";
 
   data.forEach(msg => {
-    container.innerHTML += `
-      <div class="card">
-        <h3>${msg.name}</h3>
-        <p class="email">${msg.email}</p>
-        <p>${msg.message}</p>
-        <p class="date">${new Date(msg.createdAt).toLocaleString()}</p>
+    const div = document.createElement("div");
+    div.className = "message-card";
 
-        <button onclick="deleteMessage('${msg._id}')">🗑 Delete</button>
-      </div>
+    div.innerHTML = `
+      <h4>${msg.name}</h4>
+      <p>${msg.email}</p>
+      <p>${msg.message}</p>
+      <button onclick="deleteMessage('${msg._id}')">Delete</button>
     `;
+
+    container.appendChild(div);
   });
 }
 
-// ==========================
-// DELETE FUNCTION
-// ==========================
+// 🗑 Delete message
 async function deleteMessage(id) {
-  if (!confirm("Delete this message?")) return;
-
-  await fetch(`https://quicktools-backend-b775.onrender.com/contact/${id}`, {
-    method: "DELETE"
+  await fetch(backend + "/contact/" + id, {
+    method: "DELETE",
+    headers: {
+      Authorization: token
+    }
   });
 
-  alert("Deleted!");
   loadMessages();
+  loadStats();
 }
 
-// ==========================
-// FILTER FUNCTION
-// ==========================
-function filterMessages() {
-  const search = document.getElementById("searchInput").value.toLowerCase();
+// 👥 Load users
+async function loadUsers() {
+  const res = await fetch(backend + "/users", {
+    headers: {
+      Authorization: token
+    }
+  });
 
-  const filtered = allMessages.filter(msg =>
-    msg.name.toLowerCase().includes(search) ||
-    msg.email.toLowerCase().includes(search)
-  );
+  const data = await res.json();
 
-  displayMessages(filtered);
+  const container = document.getElementById("userList");
+  container.innerHTML = "";
+
+  data.forEach(u => {
+
+    const div = document.createElement("div");
+    div.className = "message-card";
+
+    const isAdmin = u.username === "quicktoolsstudent@gmail.com";
+
+    div.innerHTML = `
+      <p>${u.username}</p>
+      ${!isAdmin 
+        ? `<button onclick="deleteUser('${u._id}')">Delete</button>` 
+        : `<span style="color:green">Admin</span>`}
+    `;
+
+    container.appendChild(div);
+  });
 }
 
-// ✅ INITIAL LOAD
+// 🗑 Delete user
+async function deleteUser(id) {
+  if (!confirm("Delete this user?")) return;
 
+  await fetch(backend + "/user/" + id, {
+    method: "DELETE",
+    headers: {
+      Authorization: token
+    }
+  });
 
+  loadUsers();
+  loadStats();
+}
+
+// 🚀 Init
+loadStats();
 loadMessages();
-loadStats(); // ✅ ADD THIS
-
+loadUsers();
 </script>
-
-
 
 </body>
 </html>

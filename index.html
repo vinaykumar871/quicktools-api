@@ -20,6 +20,11 @@
 </head>
 
 <body>
+  <script>
+if (!localStorage.getItem("token")) {
+  window.location.href = "login.html";
+}
+</script>
 
 <nav class="navbar">
   <div class="logo">

@@ -18,59 +18,63 @@
  <input type="email" id="email" placeholder="Enter email">
  <input type="password" id="password" placeholder="Enter password">
 
-  <button onclick="signup()">Create Account</button>
-
+<button type="button" onclick="signup()">Create Account</button>
   <p id="msg"></p>
 
   <p>Already have account? <a href="login.html">Login</a></p>
 </div>
 
 <script>
+document.addEventListener("DOMContentLoaded", () => {
 
-async function signup() {
-  const emailInput = document.getElementById("email");
-  const passwordInput = document.getElementById("password");
+  window.signup = async function () {
+    const emailInput = document.getElementById("email");
+    const passwordInput = document.getElementById("password");
 
-  if (!emailInput || !passwordInput) {
-    console.log("Input IDs wrong ❌");
-    return;
-  }
-
-  const email = emailInput.value.trim();
-  const password = passwordInput.value.trim();
-
-  console.log("Sending:", email, password);
-
-  if (!email || !password) {
-    document.getElementById("msg").innerText = "⚠️ Fill all fields";
-    return;
-  }
-
-  try {
-    const res = await fetch("https://quicktools-backend-b775.onrender.com/signup", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ username: email, password })
-    });
-
-    const data = await res.json();
-    console.log("Response:", data);
-
-    if (data.success) {
-      document.getElementById("msg").innerText = "✅ Account created!";
-      document.getElementById("msg").style.color = "green";
-    } else {
-      document.getElementById("msg").innerText = data.message;
+    if (!emailInput || !passwordInput) {
+      console.log("Input IDs wrong ❌");
+      return;
     }
 
-  } catch (err) {
-    console.log(err);
-    document.getElementById("msg").innerText = "❌ Server error";
-  }
-}
+    const email = emailInput.value.trim();
+    const password = passwordInput.value.trim();
 
+    console.log("Sending:", email, password);
+
+    if (!email || !password) {
+      document.getElementById("msg").innerText = "⚠️ Fill all fields";
+      return;
+    }
+
+    try {
+      const res = await fetch("https://quicktools-backend-b775.onrender.com/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          username: email,
+          password: password
+        })
+      });
+
+      const data = await res.json();
+      console.log("Response:", data);
+
+      if (data.success) {
+        document.getElementById("msg").innerText = "✅ Account created!";
+        document.getElementById("msg").style.color = "green";
+      } else {
+        document.getElementById("msg").innerText = data.message;
+      }
+
+    } catch (err) {
+      console.log(err);
+      document.getElementById("msg").innerText = "❌ Server error";
+    }
+  };
+
+});
 </script>
 
 </body>
