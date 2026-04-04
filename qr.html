@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>QR Code Generator - QuickTools</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="style.css">
+
+  <!-- QR LIBRARY -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+  <style>
+    .box {
+      max-width: 500px;
+      margin: 60px auto;
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      text-align: center;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+    }
+
+    button {
+      padding: 10px;
+      background: #4f46e5;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 10px;
+      width: 100%;
+    }
+
+    #qrcode {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="box">
+  <h2>📱 QR Code Generator</h2>
+
+  <input type="text" id="qrText" placeholder="Enter text or URL">
+
+  <button onclick="generateQR()">Generate QR</button>
+  <button onclick="downloadQR()">Download</button>
+
+  <div id="qrcode"></div>
+</div>
+
+<script>
+let qr;
+
+// Generate QR
+function generateQR() {
+  const text = document.getElementById("qrText").value;
+
+  if (!text) return;
+
+  document.getElementById("qrcode").innerHTML = "";
+
+  qr = new QRCode(document.getElementById("qrcode"), {
+    text: text,
+    width: 200,
+    height: 200
+  });
+}
+
+// Download QR
+function downloadQR() {
+  const img = document.querySelector("#qrcode img");
+
+  if (!img) {
+    alert("Generate QR first!");
+    return;
+  }
+
+  const link = document.createElement("a");
+  link.href = img.src;
+  link.download = "qrcode.png";
+  link.click();
+}
+</script>
+
+</body>
+</html>

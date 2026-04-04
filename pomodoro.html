@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Pomodoro Timer - QuickTools</title>
+  <button onclick="addShortcut('Pomodoro Timer','pomodoro.html')">⭐ Add Shortcut</button>
+<button onclick="removeShortcut('pomodoro.html')">❌ Remove Shortcut</button>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    .timer-box {
+      max-width: 400px;
+      margin: 80px auto;
+      background: white;
+      padding: 30px;
+      text-align: center;
+      border-radius: 12px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .time {
+      font-size: 48px;
+      margin: 20px 0;
+      color: #4f46e5;
+    }
+
+    button {
+      margin: 5px;
+      padding: 10px 20px;
+      border: none;
+      background: #4f46e5;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #4338ca;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="timer-box">
+  <h2>⏱ Pomodoro Timer</h2>
+
+  <div class="time" id="time">25:00</div>
+
+  <button onclick="startTimer()">Start</button>
+  <button onclick="pauseTimer()">Pause</button>
+  <button onclick="resetTimer()">Reset</button>
+
+</div>
+
+<script>
+let time = 1500; // 25 min
+let timer;
+
+function updateDisplay() {
+  let min = Math.floor(time / 60);
+  let sec = time % 60;
+
+  document.getElementById("time").innerText =
+    `${String(min).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+}
+
+function startTimer() {
+  if (timer) return;
+
+  timer = setInterval(() => {
+    if (time > 0) {
+      time--;
+      updateDisplay();
+    } else {
+      clearInterval(timer);
+      timer = null;
+      alert("⏰ Time's up!");
+    }
+  }, 1000);
+}
+
+function pauseTimer() {
+  clearInterval(timer);
+  timer = null;
+}
+
+function resetTimer() {
+  pauseTimer();
+  time = 1500;
+  updateDisplay();
+}
+
+updateDisplay();
+
+// ⭐ ADD SHORTCUT
+function addShortcut(name, link) {
+  let shortcuts = JSON.parse(localStorage.getItem("shortcuts")) || [];
+
+  if (!shortcuts.find(s => s.link === link)) {
+    shortcuts.push({ name, link });
+    localStorage.setItem("shortcuts", JSON.stringify(shortcuts));
+    alert("✅ Added to shortcuts");
+  } else {
+    alert("⚠ Already added");
+  }
+}
+
+// ❌ REMOVE SHORTCUT
+function removeShortcut(link) {
+  let shortcuts = JSON.parse(localStorage.getItem("shortcuts")) || [];
+
+  shortcuts = shortcuts.filter(s => s.link !== link);
+
+  localStorage.setItem("shortcuts", JSON.stringify(shortcuts));
+
+  alert("❌ Removed from shortcuts");
+}
+</script>
+
+</body>
+</html>

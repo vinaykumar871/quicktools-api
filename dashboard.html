@@ -2,94 +2,291 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-
   <title>Dashboard - QuickTools</title>
-
-  <meta name="description" content="Explore free tools like CGPA Calculator, Resume Builder and ATS Resume Checker.">
-
-  <meta name="keywords" content="dashboard tools, student tools, resume tools">
-
-  <meta name="author" content="QuickTools">
-
-  <meta name="robots" content="index, follow">
-
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+
+  <!-- ✅ PWA Manifest -->
+  <link rel="manifest" href="manifest.json">
+
+  <style>
+    body {
+      display: flex;
+      margin: 0;
+      font-family: Poppins, sans-serif;
+    }
+
+    .sidebar {
+      width: 220px;
+      background: #4f46e5;
+      color: white;
+      height: 100vh;
+      padding: 20px;
+    }
+
+    .menu-item {
+      padding: 10px;
+      cursor: pointer;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+
+    .menu-item:hover {
+      background: rgba(255,255,255,0.2);
+    }
+
+    .main {
+      flex: 1;
+      padding: 30px;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .tools-grid {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      width: 200px;
+      box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+    }
+
+    .card a {
+      display: block;
+      margin-top: 10px;
+      color: white;
+      background: #4f46e5;
+      padding: 5px;
+      text-align: center;
+      border-radius: 6px;
+      text-decoration: none;
+    }
+
+    /* 🔥 Install Button Style */
+    #installBtn {
+      display: none;
+      padding: 8px 12px;
+      background: green;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+  </style>
 </head>
 
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <h2>QuickTools</h2>
+
+  <div class="menu-item" onclick="loadTools('career')">🚀 Career Boost</div>
+  <div class="menu-item" onclick="loadTools('productivity')">📊 Productivity Hub</div>
+  <div class="menu-item" onclick="loadTools('tools')">🛠 Quick Tools</div>
+  <div class="menu-item" onclick="loadTools('games')">🎮 Brain Games</div>
+  <div class="menu-item" onclick="loadTools('ai')">🤖 AI Tools</div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- 🔥 TOP BAR -->
+  <div class="top-bar">
+    <h2 id="title">Welcome 👋</h2>
+
+    <h3>⭐ Quick Access</h3>
+<div id="shortcutContainer" class="shortcut-grid"></div>
+
+    <div>
+      <span id="userEmail"></span>
+      <button id="installBtn">📲 Install App</button>
+      <button onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+
+  <div class="tools-grid" id="toolsContainer"></div>
+</div>
+
 <script>
-// 🔐 Protect page
+// 🔐 Protect
 if (!localStorage.getItem("token")) {
   window.location.href = "login.html";
 }
 
-// 🚪 Logout function
+// 👤 Show email
+document.getElementById("userEmail").innerText = localStorage.getItem("user");
+
+// 🚪 Logout
 function logout() {
-  localStorage.removeItem("user");
-  localStorage.removeItem("token");
+  localStorage.clear();
   window.location.href = "login.html";
 }
-</script>
 
-<body>
+// 📦 Load tools
+function loadTools(type) {
+  const container = document.getElementById("toolsContainer");
+  const title = document.getElementById("title");
 
-<nav class="navbar">
-  <div class="logo">
-    <span>QuickTools</span>
-  </div>
+  container.innerHTML = "";
 
-  <ul class="nav-links">
-    <li><a href="index.html">Home</a></li>
-    <li><button onclick="logout()">Logout</button></li>
-  </ul>
-</nav>
+  let tools = [];
 
-<section class="dashboard">
-  <h1>Welcome, <span id="username"></span> 👋</h1>
-<h1> 📚 Academic Zone</h1>
-  <div class="tools-grid">
-    <a href="cgpa.html" class="tool-card">CGPA Calculator</a>
-    <a href="age.html" class="tool-card">Age Calculator</a>
-    <a href="percentage.html" class="tool-card">Percentage</a>
-    <a href="resume.html" class="tool-card">Resume Builder</a>
-    <a href="ats.html" class="tool-card">ATS Checker</a>
-    
-  </div>
-</section>
-<!-- 🎮 FUN ZONE -->
-<section class="dashboard">
-  <h1>🎮 Fun Zone</h1>
+  if (type === "career") {
+    title.innerText = "🚀 Career Boost";
+    tools = [
+      { name: "ATS Checker", link: "ats.html" },
+      { name: "Resume Builder", link: "resume.html" },
+      { name: "Interview Practice", link: "interview.html" },
+      { name: "Cover Letter", link: "coverletter.html" },
+      { name: "LinkedIn Bio", link: "linkedin.html" }
+      
+    ];
+  }
 
-  <div class="tools-grid">
+  if (type === "productivity") {
+    title.innerText = "📊 Productivity Hub";
+    tools = [
+      { name: "Pomodoro Timer", link: "pomodoro.html" },
+      { name: "Daily Planner", link: "#" }
+      { name: "Daily Planner", link: "planner.html" }
+      { name: "Habit Tracker", link: "habit.html" }
+      { name: "Goal Tracker", link: "goal.html" }
+    ];
+  }
 
-    <a href="typing.html" class="tool-card">
-      <h3>⌨ Typing Test</h3>
-      <p>Check speed & accuracy</p>
-    </a>
+  if (type === "tools") {
+    title.innerText = "🛠 Quick Tools";
+    tools = [
+      { name: "Calculator", link: "#" },
+      { name: "Age Calculator", link: "age.html" }
+      { name: "Word Counter", link: "wordcounter.html" }
+      { name: "Password Generator", link: "password.html" }
+      { name: "QR Code Generator", link: "qr.html" }
+    ];
+  }
 
-    <a href="reaction.html" class="tool-card">
-  <h3>⚡ Reaction Test</h3>
-  <p>Test your reflex speed</p>
-</a>
+  if (type === "games") {
+    title.innerText = "🎮 Brain Games";
+    tools = [
+      { name: "Typing Test", link: "typing.html" }
+    ];
+  }
 
-   <a href="click.html" class="tool-card">
-  <h3>🎯 Click Speed</h3>
-  <p>Test how fast you can click</p>
-</a>
+  if (type === "ai") {
+    title.innerText = "🤖 AI Tools";
+    tools = [
+      { name: "AI Chat", link: "#" }
+      { name: "AI Chat Assistant", link: "ai-chat.html" }
+    ];
+  }
 
-    <a href="memory.html" class="tool-card">
-  <h3>🧠 Memory Game</h3>
-  <p>Train your brain & focus</p>
-</a>
+  tools.forEach(t => {
+    const div = document.createElement("div");
+    div.className = "card";
+    div.innerHTML = `
+      <h3>${t.name}</h3>
+      <a href="${t.link}">Open</a>
+    `;
+    container.appendChild(div);
+  });
+}
 
-  </div>
-</section>
+// 🚀 Default
+loadTools("career");
 
-<script>
-document.getElementById("username").innerText =
-  localStorage.getItem("user");
+
+// =======================
+// 📲 INSTALL APP SCRIPT
+// =======================
+let deferredPrompt;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+
+  document.getElementById("installBtn").style.display = "inline-block";
+});
+
+document.getElementById("installBtn").addEventListener("click", async () => {
+  if (!deferredPrompt) return;
+
+  deferredPrompt.prompt();
+
+  const choice = await deferredPrompt.userChoice;
+
+  if (choice.outcome === "accepted") {
+    console.log("App installed ✅");
+  }
+
+  deferredPrompt = null;
+});
+
+// ⭐ LOAD SHORTCUTS
+function loadShortcuts() {
+  const container = document.getElementById("shortcutContainer");
+  const shortcuts = JSON.parse(localStorage.getItem("shortcuts")) || [];
+
+  container.innerHTML = "";
+
+  if (shortcuts.length === 0) {
+    container.innerHTML = "<p>No shortcuts yet</p>";
+    return;
+  }
+
+  shortcuts.forEach(s => {
+
+    const div = document.createElement("div");
+    div.className = "shortcut-item";
+
+    // 🎯 Auto icon based on tool
+    let icon = "⚙";
+    if (s.name.toLowerCase().includes("pomodoro")) icon = "⏱";
+    else if (s.name.toLowerCase().includes("resume")) icon = "📄";
+    else if (s.name.toLowerCase().includes("interview")) icon = "🧠";
+    else if (s.name.toLowerCase().includes("ai")) icon = "🤖";
+
+    div.innerHTML = `
+      <div class="shortcut-icon" onclick="openTool('${s.link}')">
+        ${icon}
+      </div>
+      <div class="shortcut-name">${s.name}</div>
+      <button onclick="removeShortcutDashboard('${s.link}')">❌</button>
+    `;
+
+    container.appendChild(div);
+  });
+}
+
+function openTool(link) {
+  window.location.href = link;
+}
+
+// ❌ REMOVE FROM DASHBOARD
+function removeShortcutDashboard(link) {
+  let shortcuts = JSON.parse(localStorage.getItem("shortcuts")) || [];
+
+  shortcuts = shortcuts.filter(s => s.link !== link);
+
+  localStorage.setItem("shortcuts", JSON.stringify(shortcuts));
+
+  loadShortcuts();
+}
+
+// 🚀 CALL ON LOAD
+loadShortcuts();
 </script>
 
 </body>

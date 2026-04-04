@@ -73,6 +73,13 @@
 
 <!-- ✅ SCRIPT -->
 <script>
+
+// 🔥 AUTO LOAD DATA
+document.addEventListener("DOMContentLoaded", () => {
+  loadData();
+});
+
+// 🚀 GENERATE RESUME
 function generateResume() {
   const name = document.getElementById("name").value || "";
   const phone = document.getElementById("phone").value || "";
@@ -127,12 +134,57 @@ function generateResume() {
       </ul>
     </div>
   `;
+
+  // 🔥 SAVE DATA
+  saveData();
 }
 
+// 💾 SAVE DATA
+function saveData() {
+  const data = {
+    name: document.getElementById("name").value,
+    phone: document.getElementById("phone").value,
+    email: document.getElementById("email").value,
+    objective: document.getElementById("objective").value,
+    degree: document.getElementById("degree").value,
+    inter: document.getElementById("inter").value,
+    ssc: document.getElementById("ssc").value,
+    skills: document.getElementById("skills").value,
+    languages: document.getElementById("languages").value,
+    projects: document.getElementById("projects").value,
+    certifications: document.getElementById("certifications").value
+  };
+
+  localStorage.setItem("resumeData", JSON.stringify(data));
+}
+
+// 📥 LOAD DATA
+function loadData() {
+  const data = JSON.parse(localStorage.getItem("resumeData"));
+
+  if (!data) return;
+
+  document.getElementById("name").value = data.name || "";
+  document.getElementById("phone").value = data.phone || "";
+  document.getElementById("email").value = data.email || "";
+  document.getElementById("objective").value = data.objective || "";
+  document.getElementById("degree").value = data.degree || "";
+  document.getElementById("inter").value = data.inter || "";
+  document.getElementById("ssc").value = data.ssc || "";
+  document.getElementById("skills").value = data.skills || "";
+  document.getElementById("languages").value = data.languages || "";
+  document.getElementById("projects").value = data.projects || "";
+  document.getElementById("certifications").value = data.certifications || "";
+
+  // 🔥 AUTO GENERATE PREVIEW
+  generateResume();
+}
+
+// 📄 DOWNLOAD PDF
 function downloadPDF() {
   const element = document.getElementById("resumePreview");
 
-  if (!element.innerText.trim()) {
+  if (!element.innerText.trim() || element.innerText.includes("Your Resume Preview")) {
     alert("⚠ Please generate resume first!");
     return;
   }
@@ -147,6 +199,7 @@ function downloadPDF() {
 
   html2pdf().set(opt).from(element).save();
 }
+
 </script>
 
 </body>

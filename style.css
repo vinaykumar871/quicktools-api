@@ -543,3 +543,72 @@ button {
   border-radius: 6px;
   cursor: pointer;
 }
+.password-box {
+  position: relative;
+  width: 100%;
+}
+
+.password-box input {
+  width: 100%;
+  padding: 10px;
+  padding-right: 40px;
+}
+
+.toggle-eye {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+/* Strength colors */
+#strengthText {
+  margin-top: 5px;
+  font-size: 14px;
+}
+
+.weak {
+  color: red;
+}
+
+.medium {
+  color: orange;
+}
+
+.strong {
+  color: green;
+}
+.shortcut-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.shortcut-item {
+  text-align: center;
+  cursor: pointer;
+}
+
+.shortcut-icon {
+  width: 60px;
+  height: 60px;
+  background: #4f46e5;
+  color: white;
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  margin: auto;
+}
+
+.shortcut-name {
+  margin-top: 5px;
+  font-size: 14px;
+}
+
+.shortcut-item:hover .shortcut-icon {
+  transform: scale(1.1);
+}

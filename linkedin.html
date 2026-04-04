@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>LinkedIn Bio Generator - QuickTools</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="style.css">
+
+  <!-- PDF SUPPORT -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+
+  <!-- DOCX SUPPORT -->
+  <script src="https://unpkg.com/mammoth/mammoth.browser.min.js"></script>
+</head>
+
+<body class="tool-page">
+
+<h1>💼 LinkedIn Bio Generator</h1>
+
+<div class="tool-card">
+
+  <input type="file" id="resumeFile" accept=".txt,.pdf,.docx">
+
+  <button onclick="generateBio()">Generate Bio</button>
+
+  <pre id="result"></pre>
+
+</div>
+
+<script>
+
+// 📄 UNIVERSAL FILE READER
+async function readResumeFile() {
+  const file = document.getElementById("resumeFile").files[0];
+  if (!file) return "";
+
+  // PDF
+  if (file.type === "application/pdf") {
+    const reader = new FileReader();
+
+    return new Promise((resolve) => {
+      reader.onload = async function () {
+        const typedarray = new Uint8Array(this.result);
+        const pdf = await pdfjsLib.getDocument(typedarray).promise;
+
+        let text = "";
+
+        for (let i = 1; i <= pdf.numPages; i++) {
+          const page = await pdf.getPage(i);
+          const content = await page.getTextContent();
+
+          content.items.forEach(item => {
+            text += item.str + " ";
+          });
+        }
+
+        resolve(text);
+      };
+
+      reader.readAsArrayBuffer(file);
+    });
+  }
+
+  // DOCX
+  if (file.name.endsWith(".docx")) {
+    const reader = new FileReader();
+
+    return new Promise((resolve) => {
+      reader.onload = async function () {
+        const result = await mammoth.extractRawText({ arrayBuffer: reader.result });
+        resolve(result.value);
+      };
+
+      reader.readAsArrayBuffer(file);
+    });
+  }
+
+  // TXT
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = e => resolve(e.target.result);
+    reader.readAsText(file);
+  });
+}
+
+// 💼 GENERATE BIO
+async function generateBio() {
+
+  const resumeText = await readResumeFile();
+  const data = JSON.parse(localStorage.getItem("resumeData"));
+
+  let finalText = "";
+
+  if (resumeText) {
+    finalText = resumeText;
+  } else if (data) {
+    finalText = `
+Name: ${data.name}
+Skills: ${data.skills}
+Projects: ${data.projects}
+`;
+  } else {
+    alert("⚠ Upload resume or create resume first");
+    return;
+  }
+
+  const prompt = `
+Write a professional LinkedIn bio.
+
+Resume:
+${finalText}
+
+Make it:
+- Short
+- Professional
+- Attractive
+`;
+
+  try {
+    const res = await fetch("https://quicktools-backend-b775.onrender.com/generate", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    prompt: prompt
+  })
+});
+
+const result = await res.json();
+document.getElementById("result").innerText = result.text;
+
+  } catch (err) {
+    console.log(err);
+    alert("Error generating bio");
+  }
+}
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Interview Practice - QuickTools</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    .quiz-container {
+      max-width: 600px;
+      margin: 60px auto;
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    .question {
+      font-size: 20px;
+      margin-bottom: 20px;
+    }
+
+    .option {
+      display: block;
+      background: #eef2ff;
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .option:hover {
+      background: #c7d2fe;
+    }
+
+    .correct {
+      background: #22c55e !important;
+      color: white;
+    }
+
+    .wrong {
+      background: #ef4444 !important;
+      color: white;
+    }
+
+    .btn {
+      margin-top: 15px;
+      padding: 10px 20px;
+      border: none;
+      background: #4f46e5;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .btn:hover {
+      background: #4338ca;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="quiz-container">
+  <h2>🧠 Interview Practice</h2>
+
+  <select id="category" onchange="loadCategory()">
+    <option value="aptitude">Aptitude</option>
+    <option value="java">Java</option>
+    <option value="python">Python</option>
+  </select>
+
+  <div id="quiz"></div>
+
+  <button class="btn" onclick="nextQuestion()">Next</button>
+
+  <h3 id="score"></h3>
+</div>
+
+<script>
+let current = 0;
+let score = 0;
+let selected = false;
+
+let questions = [];
+
+// 📚 Question Bank
+const data = {
+  aptitude: [
+    { q: "What is 10 + 20?", options: ["10", "20", "30", "40"], answer: 2 },
+    { q: "What is 5 * 6?", options: ["11", "30", "25", "35"], answer: 1 }
+  ],
+  java: [
+    { q: "Java is?", options: ["Compiled", "Interpreted", "Both", "None"], answer: 2 },
+    { q: "JVM stands for?", options: ["Java Virtual Machine", "Java Variable Method", "Just Value Machine", "None"], answer: 0 }
+  ],
+  python: [
+    { q: "Python is?", options: ["Compiled", "Interpreted", "Assembly", "None"], answer: 1 },
+    { q: "Which is list?", options: ["{}", "[]", "()", "<>"], answer: 1 }
+  ]
+};
+
+// 🚀 Load Category
+function loadCategory() {
+  const cat = document.getElementById("category").value;
+  questions = data[cat];
+  current = 0;
+  score = 0;
+  document.getElementById("score").innerText = "";
+  showQuestion();
+}
+
+// 📊 Show Question
+function showQuestion() {
+  selected = false;
+
+  if (current >= questions.length) {
+    document.getElementById("quiz").innerHTML = `<h3>🎉 Quiz Completed!</h3>`;
+    document.getElementById("score").innerText = `Score: ${score}/${questions.length}`;
+    return;
+  }
+
+  const q = questions[current];
+
+  let html = `<div class="question">${q.q}</div>`;
+
+  q.options.forEach((opt, i) => {
+    html += `<div class="option" onclick="selectAnswer(${i})">${opt}</div>`;
+  });
+
+  document.getElementById("quiz").innerHTML = html;
+}
+
+// ✅ Select Answer
+function selectAnswer(i) {
+  if (selected) return;
+
+  selected = true;
+
+  const q = questions[current];
+  const options = document.querySelectorAll(".option");
+
+  if (i === q.answer) {
+    options[i].classList.add("correct");
+    score++;
+  } else {
+    options[i].classList.add("wrong");
+    options[q.answer].classList.add("correct");
+  }
+}
+
+// ➡ Next Question
+function nextQuestion() {
+  if (!selected) {
+    alert("⚠️ Select an answer first!");
+    return;
+  }
+
+  current++;
+  showQuestion();
+}
+
+// 🚀 Init
+loadCategory();
+</script>
+
+</body>
+</html>

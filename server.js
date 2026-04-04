@@ -31,8 +31,7 @@ mongoose.connect(process.env.MONGO_URI)
 // =========================
 const User = mongoose.model("User", {
   username: String,
-  password: String,
-  role: { type: String, default: "user" } // 🔥 NEW
+  password: String
 });
 
 const Contact = mongoose.model("Contact", {
@@ -43,18 +42,13 @@ const Contact = mongoose.model("Contact", {
 });
 
 // =========================
-// 🔐 ADMIN EMAIL
-// =========================
-const ADMIN_EMAIL = "quicktoolsstudent@gmail.com";
-
-// =========================
-// 📩 MAIL SETUP (SECURE)
+// 📩 MAIL SETUP
 // =========================
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
+    user: "quicktoolsstudent@gmail.com",
+    pass: "eadj pcot gqgr ppcs"
   }
 });
 
@@ -66,34 +60,72 @@ const groq = new Groq({
 });
 
 // =========================
-// 🔐 TOKEN VERIFY MIDDLEWARE
+// 🤖 ATS CHECK API
 // =========================
-function verifyToken(req, res, next) {
-  const token = req.headers.authorization;
-
-  if (!token) return res.status(403).json({ message: "No token" });
-
+app.post("/ats-check", async (req, res) => {
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded;
-    next();
-  } catch {
-    res.status(401).json({ message: "Invalid token" });
+    const { resumeText, jobDesc } = req.body;
+
+    if (!resumeText) {
+      return res.json({ result: "⚠ Resume text missing" });
+    }
+
+    const prompt = `
+ATS Score format:
+
+ATS Score: XX/100
+
+- Missing Keywords
+- Improvements
+
+Resume:
+${resumeText}
+
+Job Description:
+${jobDesc}
+`;
+
+    const completion = await groq.chat.completions.create({
+      messages: [{ role: "user", content: prompt }],
+      model: "llama-3.1-8b-instant",
+    });
+
+    res.json({ result: completion.choices[0].message.content });
+
+  } catch (error) {
+    console.error(error);
+    res.json({ result: "⚠ AI failed" });
   }
-}
+});
 
 // =========================
-// 👑 ADMIN CHECK
+// 🤖 AI CHAT API (NEW 🔥)
 // =========================
-function isAdmin(req, res, next) {
-  if (req.user.username !== ADMIN_EMAIL) {
-    return res.status(403).json({ message: "Admin only" });
+app.post("/ai-chat", async (req, res) => {
+  try {
+    const { prompt } = req.body;
+
+    if (!prompt) {
+      return res.json({ reply: "Please enter a message" });
+    }
+
+    const completion = await groq.chat.completions.create({
+      messages: [{ role: "user", content: prompt }],
+      model: "llama-3.1-8b-instant",
+    });
+
+    res.json({
+      reply: completion.choices[0].message.content
+    });
+
+  } catch (err) {
+    console.log(err);
+    res.json({ reply: "AI failed" });
   }
-  next();
-}
+});
 
 // =========================
-// 🔐 SIGNUP
+// 🔐 SIGNUP API
 // =========================
 app.post("/signup", async (req, res) => {
   try {
@@ -113,8 +145,7 @@ app.post("/signup", async (req, res) => {
 
     const newUser = new User({
       username,
-      password: hashedPassword,
-      role: username === ADMIN_EMAIL ? "admin" : "user"
+      password: hashedPassword
     });
 
     await newUser.save();
@@ -128,7 +159,7 @@ app.post("/signup", async (req, res) => {
 });
 
 // =========================
-// 🔐 LOGIN
+// 🔐 LOGIN API
 // =========================
 app.post("/login", async (req, res) => {
   try {
@@ -143,12 +174,12 @@ app.post("/login", async (req, res) => {
     if (!isMatch) return res.json({ success: false });
 
     const token = jwt.sign(
-      { username: user.username, role: user.role },
+      { username: user.username },
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
 
-    res.json({ success: true, token, role: user.role });
+    res.json({ success: true, token });
 
   } catch (error) {
     console.error(error);
@@ -157,15 +188,15 @@ app.post("/login", async (req, res) => {
 });
 
 // =========================
-// 📩 CONTACT
+// 📩 CONTACT API
 // =========================
 app.post("/contact", async (req, res) => {
   try {
     const { name, email, message } = req.body;
 
     await transporter.sendMail({
-      from: process.env.EMAIL_USER,
-      to: process.env.EMAIL_USER,
+      from: "quicktoolsstudent@gmail.com",
+      to: "quicktoolsstudent@gmail.com",
       subject: "New Contact Message",
       text: `Name: ${name}\nEmail: ${email}\nMessage: ${message}`
     });
@@ -179,49 +210,14 @@ app.post("/contact", async (req, res) => {
 });
 
 // =========================
-// 📊 STATS (ADMIN ONLY)
+// 📊 USERS & ADMIN
 // =========================
-app.get("/stats", verifyToken, isAdmin, async (req, res) => {
-  const totalMessages = await Contact.countDocuments();
-  const totalUsers = await User.countDocuments();
-
-  res.json({ messages: totalMessages, users: totalUsers });
-});
-
-// =========================
-// 📩 GET CONTACTS (ADMIN)
-// =========================
-app.get("/contacts", verifyToken, isAdmin, async (req, res) => {
-  const messages = await Contact.find().sort({ createdAt: -1 });
-  res.json(messages);
-});
-
-// =========================
-// 🗑 DELETE MESSAGE
-// =========================
-app.delete("/contact/:id", verifyToken, isAdmin, async (req, res) => {
-  await Contact.findByIdAndDelete(req.params.id);
-  res.json({ success: true });
-});
-
-// =========================
-// 👥 GET USERS (ADMIN)
-// =========================
-app.get("/users", verifyToken, isAdmin, async (req, res) => {
+app.get("/users", async (req, res) => {
   const users = await User.find();
   res.json(users);
 });
 
-// =========================
-// 🗑 DELETE USER (SAFE)
-// =========================
-app.delete("/user/:id", verifyToken, isAdmin, async (req, res) => {
-  const user = await User.findById(req.params.id);
-
-  if (user.username === ADMIN_EMAIL) {
-    return res.json({ success: false, message: "Cannot delete admin" });
-  }
-
+app.delete("/user/:id", async (req, res) => {
   await User.findByIdAndDelete(req.params.id);
   res.json({ success: true });
 });

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Goal Tracker - QuickTools</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    .goal-box {
+      max-width: 600px;
+      margin: 60px auto;
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    input {
+      padding: 10px;
+      margin: 5px;
+      width: 45%;
+    }
+
+    button {
+      padding: 10px;
+      background: #4f46e5;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .goal {
+      background: #eef2ff;
+      padding: 12px;
+      margin-top: 10px;
+      border-radius: 8px;
+    }
+
+    .progress-bar {
+      height: 10px;
+      background: #ddd;
+      border-radius: 5px;
+      margin-top: 8px;
+      overflow: hidden;
+    }
+
+    .progress {
+      height: 100%;
+      background: #22c55e;
+      width: 0%;
+    }
+
+    .actions {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="goal-box">
+  <h2>🎯 Goal Tracker</h2>
+
+  <input type="text" id="goalName" placeholder="Goal name">
+  <input type="number" id="goalTarget" placeholder="Target (e.g. 10)">
+  <br>
+  <button onclick="addGoal()">Add Goal</button>
+
+  <div id="goalList"></div>
+</div>
+
+<script>
+let goals = JSON.parse(localStorage.getItem("goals")) || [];
+
+function saveGoals() {
+  localStorage.setItem("goals", JSON.stringify(goals));
+}
+
+// 📊 Render
+function renderGoals() {
+  const container = document.getElementById("goalList");
+  container.innerHTML = "";
+
+  goals.forEach((g, i) => {
+    const percent = Math.min((g.current / g.target) * 100, 100);
+
+    const div = document.createElement("div");
+    div.className = "goal";
+
+    div.innerHTML = `
+      <h3>${g.name}</h3>
+      <p>${g.current} / ${g.target}</p>
+
+      <div class="progress-bar">
+        <div class="progress" style="width:${percent}%"></div>
+      </div>
+
+      <div class="actions">
+        <button onclick="increase(${i})">+ Progress</button>
+        <button onclick="deleteGoal(${i})">❌ Delete</button>
+      </div>
+    `;
+
+    container.appendChild(div);
+  });
+}
+
+// ➕ Add
+function addGoal() {
+  const name = document.getElementById("goalName").value;
+  const target = parseInt(document.getElementById("goalTarget").value);
+
+  if (!name || !target) return;
+
+  goals.push({
+    name,
+    target,
+    current: 0
+  });
+
+  document.getElementById("goalName").value = "";
+  document.getElementById("goalTarget").value = "";
+
+  saveGoals();
+  renderGoals();
+}
+
+// ➕ Increase progress
+function increase(i) {
+  if (goals[i].current < goals[i].target) {
+    goals[i].current += 1;
+  }
+
+  saveGoals();
+  renderGoals();
+}
+
+// ❌ Delete
+function deleteGoal(i) {
+  goals.splice(i, 1);
+  saveGoals();
+  renderGoals();
+}
+
+// 🚀 Init
+renderGoals();
+</script>
+
+</body>
+</html>

@@ -8,6 +8,32 @@
 
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <style>
+    .password-box {
+      position: relative;
+    }
+
+    .password-box input {
+      width: 100%;
+      padding-right: 40px;
+    }
+
+    .toggle-eye {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+    }
+
+    #strengthText {
+      font-size: 14px;
+      margin-top: 5px;
+    }
+  </style>
 </head>
 
 <body class="auth-page">
@@ -15,10 +41,21 @@
 <div class="login-container">
   <h2>Sign Up</h2>
 
- <input type="email" id="email" placeholder="Enter email">
- <input type="password" id="password" placeholder="Enter password">
+  <input type="email" id="email" placeholder="Enter email">
 
-<button type="button" onclick="signup()">Create Account</button>
+  <!-- 🔥 PASSWORD BOX -->
+ <div class="password-box">
+  <input type="password" id="password" placeholder="Enter password" oninput="checkStrength()">
+  <span class="toggle-eye" onclick="togglePassword()">
+<i id="eyeIcon" class="fa-solid fa-eye-slash"></i>
+  </span>
+</div>
+
+  <!-- 🔥 STRENGTH TEXT -->
+  <p id="strengthText"></p>
+
+  <button type="button" onclick="signup()">Create Account</button>
+
   <p id="msg"></p>
 
   <p>Already have account? <a href="login.html">Login</a></p>
@@ -27,22 +64,73 @@
 <script>
 document.addEventListener("DOMContentLoaded", () => {
 
-  window.signup = async function () {
-    const emailInput = document.getElementById("email");
-    const passwordInput = document.getElementById("password");
+  // 👁️ TOGGLE PASSWORD (FIXED ICON BEHAVIOR)
+  window.togglePassword = function () {
+    const input = document.getElementById("password");
+    const icon = document.getElementById("eyeIcon");
 
-    if (!emailInput || !passwordInput) {
-      console.log("Input IDs wrong ❌");
+    if (input.type === "password") {
+      input.type = "text";
+      icon.classList.remove("fa-eye-slash");
+      icon.classList.add("fa-eye");   // 👁️ OPEN EYE
+    } else {
+      input.type = "password";
+      icon.classList.remove("fa-eye");
+      icon.classList.add("fa-eye-slash"); // 🙈 CLOSED EYE
+    }
+  };
+
+  // 📊 PASSWORD STRENGTH
+  window.checkStrength = function () {
+    const password = document.getElementById("password").value;
+    const strengthText = document.getElementById("strengthText");
+
+    let strength = 0;
+
+    if (password.length >= 6) strength++;
+    if (/[A-Z]/.test(password)) strength++;
+    if (/[a-z]/.test(password)) strength++;
+    if (/[0-9]/.test(password)) strength++;
+    if (/[^A-Za-z0-9]/.test(password)) strength++;
+
+    if (password.length === 0) {
+      strengthText.innerText = "";
+    } 
+    else if (strength <= 2) {
+      strengthText.innerText = "🔴 Weak Password";
+      strengthText.style.color = "red";
+    } 
+    else if (strength <= 4) {
+      strengthText.innerText = "🟠 Medium Password";
+      strengthText.style.color = "orange";
+    } 
+    else {
+      strengthText.innerText = "🟢 Strong Password";
+      strengthText.style.color = "green";
+    }
+  };
+
+  // 🚀 SIGNUP
+  window.signup = async function () {
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value.trim();
+    const msg = document.getElementById("msg");
+
+    if (!email || !password) {
+      msg.innerText = "⚠️ Fill all fields";
+      msg.style.color = "red";
       return;
     }
 
-    const email = emailInput.value.trim();
-    const password = passwordInput.value.trim();
+    // 🔒 VALIDATION
+    if (password.length < 6 ||
+        !/[A-Z]/.test(password) ||
+        !/[a-z]/.test(password) ||
+        !/[0-9]/.test(password) ||
+        !/[^A-Za-z0-9]/.test(password)) {
 
-    console.log("Sending:", email, password);
-
-    if (!email || !password) {
-      document.getElementById("msg").innerText = "⚠️ Fill all fields";
+      msg.innerText = "Password must include uppercase, lowercase, number & special character";
+      msg.style.color = "red";
       return;
     }
 
@@ -59,18 +147,19 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       const data = await res.json();
-      console.log("Response:", data);
 
       if (data.success) {
-        document.getElementById("msg").innerText = "✅ Account created!";
-        document.getElementById("msg").style.color = "green";
+        msg.innerText = "✅ Account created!";
+        msg.style.color = "green";
       } else {
-        document.getElementById("msg").innerText = data.message;
+        msg.innerText = data.message;
+        msg.style.color = "red";
       }
 
     } catch (err) {
       console.log(err);
-      document.getElementById("msg").innerText = "❌ Server error";
+      msg.innerText = "❌ Server error";
+      msg.style.color = "red";
     }
   };
 

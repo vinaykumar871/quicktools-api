@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Word Counter - QuickTools</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    .box {
+      max-width: 700px;
+      margin: 50px auto;
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    textarea {
+      width: 100%;
+      height: 180px;
+      padding: 12px;
+      margin-top: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      resize: none;
+    }
+
+    .stats {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 15px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .card {
+      background: #eef2ff;
+      padding: 10px;
+      border-radius: 8px;
+      flex: 1;
+      text-align: center;
+    }
+
+    h3 {
+      margin-bottom: 5px;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="box">
+  <h2>🔤 Word Counter</h2>
+
+  <textarea id="text" placeholder="Start typing here..."></textarea>
+
+  <div class="stats">
+    <div class="card">
+      <h3 id="words">0</h3>
+      <p>Words</p>
+    </div>
+
+    <div class="card">
+      <h3 id="chars">0</h3>
+      <p>Characters</p>
+    </div>
+
+    <div class="card">
+      <h3 id="nospace">0</h3>
+      <p>No Spaces</p>
+    </div>
+
+    <div class="card">
+      <h3 id="sentences">0</h3>
+      <p>Sentences</p>
+    </div>
+  </div>
+</div>
+
+<script>
+const textArea = document.getElementById("text");
+
+textArea.addEventListener("input", () => {
+  const text = textArea.value;
+
+  // Words
+  const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+
+  // Characters
+  const chars = text.length;
+
+  // No spaces
+  const nospace = text.replace(/\s/g, "").length;
+
+  // Sentences
+  const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0).length;
+
+  document.getElementById("words").innerText = words;
+  document.getElementById("chars").innerText = chars;
+  document.getElementById("nospace").innerText = nospace;
+  document.getElementById("sentences").innerText = sentences;
+});
+</script>
+
+</body>
+</html>
